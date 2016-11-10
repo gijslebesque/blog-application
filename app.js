@@ -32,11 +32,12 @@ let User = db.define ('user', {
 
 let Message = db.define ('message', {
 	title: 	sequelize.STRING,
-	body: 	sequelize.STRING,
+	body: 	sequelize.STRING
 })
+
 //db structure
-// User.hasMany(Language)
-// Language.belongsToMany(User)
+User.hasMany(Message)
+Message.belongsTo(User)
 
 
 //load static files
@@ -62,12 +63,14 @@ app.get('/profile',  (req, res) =>{
 		res.render('profile', {
 			user: user
 		})
-		console.log(user)
 	}
 })
 
 app.get('/messages', (req, res) =>{
-
+	let user = req.session.user
+	Message.findAll().then( result => {
+		res.render('messages', {message: result})
+	})
 })
 //post routes
 
@@ -112,26 +115,19 @@ app.post('/login', (req,res)=>{
 	})
 })
 
-app.post('/newMessage')
+app.post('/newMessage', (req, res) =>{
+	Message.create({
+		title: req.body.title,
+		body: req.body.body
+	}).then( ()=> {
+		req.session.user
+		res.redirect('messages')
+	})
+})
 
-
-
-// app.post('/login', (req, res)=>{
-// 	User.findOne({
-// 		where: {
-// 			email: req.body.login_email,
-// 			password: req.body.password
-// 		}
-// 	}).then( users => {
-// 		console.log(users)
-// 		// if(user. == req.body.login_email) {
-
-// 		// }
-// 	})
-// })
 
 //sync db
-db.sync({force:true}).then(db => {
+db.sync().then(db => {
 	console.log('Synced db')
 	app.listen(8000, () => {
 		console.log("server running")
