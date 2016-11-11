@@ -32,12 +32,21 @@ let User = db.define ('user', {
 
 let Message = db.define ('message', {
 	title: 	sequelize.STRING,
-	body: 	sequelize.STRING
+	body: 	sequelize.STRING,
+	userId: sequelize.INTEGER
+})
+
+let Comment = db.define ('comment', {
+	comment: sequelize.STRING,
+	messageId: sequelize.INTEGER,
+	userId: sequelize.INTEGER
 })
 
 //db structure
 User.hasMany(Message)
 Message.belongsTo(User)
+Comment.belongsTo(User)
+Comment.belongsTo(Message)
 
 
 //load static files
@@ -69,9 +78,14 @@ app.get('/profile',  (req, res) =>{
 app.get('/messages', (req, res) =>{
 	let user = req.session.user
 	Message.findAll().then( result => {
-		console.log(result[0].dataValues)
 		res.render('messages', {message: result})
 	})
+	
+})
+
+app.get('/comments', (req, res)=>{
+	let user =req.session.user
+	res.render('comments')
 })
 //post routes
 
@@ -118,12 +132,28 @@ app.post('/login', (req,res)=>{
 
 app.post('/newMessage', (req, res) =>{
 	let user = req.session.user
-	User.createMessage({
+	let message = req.session.message
+	Message.create({
 		title: req.body.title,
-		body: req.body.body
+		body: req.body.body,
+		userId: req.session.user.id
 	}).then( ()=> {
 		req.session.user
+		req.session.message
+		console.log(req.session.message)
 		res.redirect('messages')
+	})
+})
+
+app.post('/comment', (req, res)=>{
+	let user = req.session.user
+	Comment.create({
+		comment: req.body.comment,
+		messageId: req.session.user.message.id,
+		userId: user
+	}).then(()=>{
+		req.session.user
+		res.redirect('comments')
 	})
 })
 
