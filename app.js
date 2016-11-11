@@ -69,6 +69,7 @@ app.get('/profile',  (req, res) =>{
 app.get('/messages', (req, res) =>{
 	let user = req.session.user
 	Message.findAll().then( result => {
+		console.log(result[0].dataValues)
 		res.render('messages', {message: result})
 	})
 })
@@ -116,7 +117,8 @@ app.post('/login', (req,res)=>{
 })
 
 app.post('/newMessage', (req, res) =>{
-	Message.create({
+	let user = req.session.user
+	User.createMessage({
 		title: req.body.title,
 		body: req.body.body
 	}).then( ()=> {
