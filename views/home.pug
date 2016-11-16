@@ -4,23 +4,25 @@ html
 		link(href='/src/css/materialize.min.css' type ='text/css' rel='stylesheet')
 		link(href='/src/custom.css' type ='text/css' rel='stylesheet')
 	body
-		script(src='src/js/materialize.min.js')
 		script(src='src/js//jquery-3.1.1.min.js')
-		script(src='src/custom.js')
+		script(src='src/js/materialize.min.js')
+		
+		//- script(src='src/custom.js')
 
 	nav
 		div(class="nav-wrapper")
-			a(href="#" class="brand-logo") Logo
+			a(href="#" class="brand-logo") BLOGGG
 			ul(id="nav-mobile" class="right hide-on-med-and-down")
 				li: a(href="/") Home
 				li: a(href="/profile") Profile
-				li: a(href="/message") Messages
+				li: a(href="/messages") Messages
 
-
+	.div.center-align
+		p #{message}
 	.container
 		.row
 			.col.m6
-				h2.center-aling Register here
+				h2.center-aling Sign up here
 				.row
 					form(class='col.s12' method='post' action='signup')
 						.row
@@ -49,10 +51,10 @@ html
 					form(class='col.s12' method='post' action='login')
 						.row
 							.input-field.col.s12
-								input(placeholder='Email' id="login_email" type="text" class="validate" name='login_email')
+								input(placeholder='Email' id="login_email" type="email" class="validate" name='login_email')
 						.row
 							.input-field.col.s12
-								input(placeholder='Password' id="login_password" type="text" class="validate" name='login_password')
+								input(placeholder='Password' id="login_password" type="password" class="validate" name='login_password')
 						.row
 							.col.s12
 								input#remember(type='checkbox')

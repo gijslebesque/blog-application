@@ -4,12 +4,13 @@ const fs 			= require('fs')
 const sequelize 	= require('sequelize')
 const bodyParser 	= require('body-parser')
 const session 		= require('express-session')
+const bcrypt 		= require('bcrypt-nodejs')
 const app 			= express()
 
 app.use(session({
-    secret: 'oh wow very secret much security',
-    resave: true,
-    saveUninitialized: false
+	secret: 'oh wow very secret much security',
+	resave: true,
+	saveUninitialized: false
 }))
 
 
@@ -32,21 +33,21 @@ let User = db.define ('user', {
 
 let Message = db.define ('message', {
 	title: 	sequelize.STRING,
-	body: 	sequelize.STRING,
-	userId: sequelize.INTEGER
+	body: 	sequelize.TEXT,
 })
 
 let Comment = db.define ('comment', {
-	comment: sequelize.STRING,
-	messageId: sequelize.INTEGER,
-	userId: sequelize.INTEGER
+	comment: sequelize.TEXT,
 })
 
 //db structure
 User.hasMany(Message)
 Message.belongsTo(User)
-Comment.belongsTo(User)
+Message.hasMany(Comment)
 Comment.belongsTo(Message)
+User.hasMany(Comment)
+Comment.belongsTo(User)
+
 
 
 //load static files
@@ -58,48 +59,62 @@ app.set('views', __dirname + '/views')
 
 //set routes
 app.get('/', (req, res)=>{
+	
 	res.render('home', {
-        message: req.query.message,
-        user: req.session.user
+		message: req.query.message,
+		user: req.session.user
 	})
 })
 
 app.get('/profile',  (req, res) =>{
+	if (req.session.user == undefined) {
+		res.redirect('/?message=' + encodeURIComponent('You are not signed in'))
+		return
+	}
 	let user = req.session.user
 	if (user === undefined) {
 		res.redirect('/?message=' + encodeURIComponent("Please log in to view your profile."))	
 	} else {
 		res.render('profile', {
-			user: user
+			user: user,
 		})
 	}
 })
 
 app.get('/messages', (req, res) =>{
-	let user = req.session.user
-	Message.findAll().then( result => {
-		res.render('messages', {message: result})
+	if (req.session.user == undefined) {
+		res.redirect('/?message=' + encodeURIComponent('You are not signed in'))
+		return
+	}
+	Message.findAll({
+		include: [ User, Comment ]
+	}).then( result => {
+		res.render('messages', {messages: result})
 	})
 	
 })
 
-app.get('/comments', (req, res)=>{
-	let user =req.session.user
-	res.render('comments')
-})
+// app.get('/comments', (req, res)=>{
+// 	let user =req.session.user
+// 	res.render('comments')
+// })
 //post routes
 
 //register route
 app.post('/signup', (req, res) =>{
-	User.create({
-		firstName: 	req.body.signup_firstname,
-		lastName: 	req.body.signup_lastname,
-		email: 		req.body.signup_email,
-		password: 	req.body.signup_password
-	}).then( user =>{
-		req.session.user = user
-		res.redirect('/profile')
-	})
+	console.log(req.body)
+	bcrypt.hash(req.body.signup_password, null, null, (err, hash)=>{
+		if (err) throw err
+			User.create({
+				firstName: 	req.body.signup_firstname,
+				lastName: 	req.body.signup_lastname,
+				email: 		req.body.signup_email,
+				password: 	hash
+			}).then( user =>{
+				req.session.user = user
+				res.redirect('/profile')
+			})
+		})
 })
 
 //login route
@@ -119,41 +134,50 @@ app.post('/login', (req,res)=>{
 			email: req.body.login_email
 		}
 	}).then( user => {
-		if (user !== null && req.body.login_password === user.password) {
-			req.session.user = user
-			res.redirect('/profile')
-		} else {
-			res.redirect('/?message=' + encodeURIComponent("Invalid email or password."))
+		if(user == undefined) {
+			res.redirect('/?message=' + encodeURIComponent("Account does'nt excist. Please create one first."))
 		}
-	},  error =>{
-		res.redirect('/?message=' + encodeURIComponent("Invalid email or password."))
+		bcrypt.compare(req.body.login_password, user.password, (err) =>{
+			if (err) {
+				res.redirect('/?message=' + encodeURIComponent("Invalid email or password."))
+			}
+			else {
+				req.session.user = user
+				res.redirect('/profile')
+			}
+
+		})
 	})
 })
+// 		if (user !== null && req.body.login_password === user.password) {
+// 			req.session.user = user
+// 			res.redirect('/profile')
+// 		} else {
+// 			res.redirect('/?message=' + encodeURIComponent("Invalid email or password."))
+// 		}
+// 	},  error =>{
+
+// 	})
+// })
 
 app.post('/newMessage', (req, res) =>{
-	let user = req.session.user
-	let message = req.session.message
 	Message.create({
 		title: req.body.title,
 		body: req.body.body,
 		userId: req.session.user.id
 	}).then( ()=> {
-		req.session.user
-		req.session.message
-		console.log(req.session.message)
 		res.redirect('messages')
 	})
 })
 
 app.post('/comment', (req, res)=>{
-	let user = req.session.user
 	Comment.create({
-		comment: req.body.comment,
-		messageId: req.session.user.message.id,
-		userId: user
-	}).then(()=>{
-		req.session.user
-		res.redirect('comments')
+		comment: req.body.body,
+		messageId: req.body.postId,
+		userId: req.session.user.id
+	}).then((message)=>{
+		console.log('comment saved')
+		res.send(message)
 	})
 })
 
@@ -161,6 +185,25 @@ app.post('/comment', (req, res)=>{
 //sync db
 db.sync().then(db => {
 	console.log('Synced db')
+
+	// User.create({
+	// 	firstName: 	"Gijs",
+	// 	lastName: 	"Lebesque",
+	// 	email: 		"gijs@thefrench.fr",
+	// 	password: 	"password"
+	// }).then( gijs => {
+	// 	gijs.createMessage({
+	// 		title: 	"Demo post",
+	// 		body: 	"lorem ipsum amit delor",
+	// 	}).then( message => {
+	// 		message.createComment({
+	// 			comment: "DEEZ NUTS, AHA"
+	// 		}).then( comment => {
+	// 			comment.setUser( gijs )
+	// 		} )
+	// 	} )
+	// } )
+	
 	app.listen(8000, () => {
 		console.log("server running")
 	})
