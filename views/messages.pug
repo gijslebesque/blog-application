@@ -30,9 +30,9 @@ html
 						.div(class="commentss")
 							if post.comments
 								each comment in post.comments
-									p Comment: #{comment.comment}. By #{comment.firstName}
+									p Comment: #{comment.comment}.
 
-						form(class='col.s12' id=post.id, data-userId="post.user.id", method='post' action='comment')
+						form(class='col.s12' id=post.id, method='post' action='comment')
 							.input-field.col.m8
 								textarea(class="postcomment materialize-textarea" placeholder='Please leave a comment' name='comment')
 							.col.m2
