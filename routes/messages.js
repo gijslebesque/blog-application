@@ -3,6 +3,7 @@ const express = require ('express')
 const db 			= require(__dirname + '/../modules/database')
 const bodyParser 	= require('body-parser')
 const routerMessages = express.Router()
+const session 		= require(__dirname + '/../modules/session')
 
 
 routerMessages.use(bodyParser.urlencoded({

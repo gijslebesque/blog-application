@@ -11,6 +11,7 @@ $(document).ready( ()=>{
 		console.log(comment)
 		$.post("/comment", comment, (data) => {
 			$('.commentss').append( '<p>' + data.comment +'</p>')
+			$('#postcomment').val('')
 		})
 	})
 })

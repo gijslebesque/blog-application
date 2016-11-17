@@ -3,6 +3,7 @@ const bcrypt 	= require('bcrypt-nodejs')
 const db 			= require(__dirname + '/../modules/database')
 const bodyParser 	= require('body-parser')
 const routerLogin 	= express.Router()
+const session 		= require(__dirname + '/../modules/session')
 
 routerLogin.use(bodyParser.urlencoded({
 	extended: true
@@ -27,7 +28,7 @@ routerLogin.post('/login', (req,res)=>{
 		}
 	}).then( user => {
 		if(user == undefined) {
-			res.redirect('/?message=' + encodeURIComponent("Account does'nt excist. Please create one first."))
+			res.redirect('/?message=' + encodeURIComponent("Account doesn't excist. Please create one first."))
 		}
 		bcrypt.compare(req.body.login_password, user.password, (err) =>{
 			if (err) {
@@ -41,15 +42,5 @@ routerLogin.post('/login', (req,res)=>{
 		})
 	})
 })
-// 		if (user !== null && req.body.login_password === user.password) {
-// 			req.session.user = user
-// 			res.redirect('/profile')
-// 		} else {
-// 			res.redirect('/?message=' + encodeURIComponent("Invalid email or password."))
-// 		}
-// 	},  error =>{
-
-// 	})
-// })
 
 module.exports = routerLogin

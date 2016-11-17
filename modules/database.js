@@ -34,26 +34,26 @@ db.Comment.belongsTo(db.Message)
 db.User.hasMany(db.Comment)
 db.Comment.belongsTo(db.User)
 
-db.connect.sync().then(db => {
+db.connect.sync({force:true}).then(db => {
 	console.log('Synced db')
-})
 
-	// User.create({
+
+	// db.User.create({
 	// 	firstName: 	"Gijs",
 	// 	lastName: 	"Lebesque",
-	// 	email: 		"gijs@thefrench.fr",
-	// 	password: 	"password"
+	// 	email: 		"gijs@gmail.com",
+	// 	password: 	"ww"
 	// }).then( gijs => {
 	// 	gijs.createMessage({
 	// 		title: 	"Demo post",
 	// 		body: 	"lorem ipsum amit delor",
 	// 	}).then( message => {
-	// 		message.createComment({
+	// 		message.createdb.Comment({
 	// 			comment: "DEEZ NUTS, AHA"
 	// 		}).then( comment => {
 	// 			comment.setUser( gijs )
 	// 		} )
 	// 	} )
 	// } )
-
+})
 module.exports = db

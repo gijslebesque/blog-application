@@ -4,10 +4,10 @@ const routerSignUp 	= require(__dirname + '/routes/signup')
 const routerLogin 	= require(__dirname + '/routes/login')
 const routerMessages = require (__dirname + '/routes/messages')
 const routerProfile = require (__dirname + '/routes/profile')
-
+const routerLogout	= require(__dirname + '/routes/logout')
 const session 		= require('express-session')
-
 const app 			= express()
+
 
 app.use(session({
 	secret: 'oh wow very secret much security',
@@ -35,6 +35,8 @@ app.get('/', (req, res)=>{
 app.use('/', routerSignUp)
 
 app.use('/', routerLogin)
+
+app.use('/', routerLogout)
 
 app.use('/', routerProfile)
 
