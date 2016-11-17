@@ -1,6 +1,5 @@
 
 const express 	= require('express')
-const session 		= require(__dirname + '/../modules/session')
 const routerLogout 	= express.Router()
 
 routerLogout.get('/logout', function (req, res) {

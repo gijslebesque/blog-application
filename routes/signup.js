@@ -1,4 +1,4 @@
-const session 		= require(__dirname + '/../modules/session')
+
 const express 		= require('express')
 const bcrypt 		= require('bcrypt-nodejs')
 const db 			= require(__dirname + '/../modules/database')

@@ -1,11 +1,12 @@
 const sequelize 	= require('sequelize')
+
 // All db information
 
 const db = {
 
 }
 
-db.connect = new sequelize('blog', process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
+db.connect = new sequelize(process.env.POSTGRES_DB_NAME, process.env.POSTGRES_USER, process.env.POSTGRES_PASSWORD, {
 	host: 'localhost',
 	dialect: 'postgres'
 })

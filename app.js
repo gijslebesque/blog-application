@@ -1,4 +1,5 @@
 // Including the necessary modules.
+const dotenv = require('dotenv').config()
 const express 		= require('express')
 const routerSignUp 	= require(__dirname + '/routes/signup')
 const routerLogin 	= require(__dirname + '/routes/login')
@@ -10,7 +11,7 @@ const app 			= express()
 
 
 app.use(session({
-	secret: 'oh wow very secret much security',
+	secret: process.env.SESSION_SECRET,
 	resave: true,
 	saveUninitialized: false
 }))

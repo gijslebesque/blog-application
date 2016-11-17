@@ -1,7 +1,7 @@
 $(document).ready( ()=>{
 	console.log('Dom Loaded')
 	$("form").on('submit', (event)=>{
-		console.log(event.currentTarget)
+		console.log(event)
 		console.log("Comment form submits")
 		event.preventDefault()
 		let comment = {

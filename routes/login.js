@@ -3,7 +3,6 @@ const bcrypt 	= require('bcrypt-nodejs')
 const db 			= require(__dirname + '/../modules/database')
 const bodyParser 	= require('body-parser')
 const routerLogin 	= express.Router()
-const session 		= require(__dirname + '/../modules/session')
 
 routerLogin.use(bodyParser.urlencoded({
 	extended: true
